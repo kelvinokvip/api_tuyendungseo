@@ -6,7 +6,7 @@ const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
 const Fingerprint = require("express-fingerprint");
-require("./helpers/telegram")
+require("./helpers/telegram");
 var origin_urls;
 if (process.env.NODE_ENV == "development") {
   origin_urls = [
@@ -88,9 +88,11 @@ const permissionRoute = require("./routes/permission.routes");
 const categoryRoute = require("./routes/category.routes");
 const postRoute = require("./routes/post.routes");
 const userRoute = require("./routes/user.routes");
+const notificationRoute = require("./routes/notification.routes");
 
 app.use("/api", categoryRoute);
 app.use("/api", authRoute);
 app.use("/api/permission", permissionRoute);
 app.use("/api/post", postRoute);
 app.use("/api/user", userRoute);
+app.use("/api", notificationRoute);
