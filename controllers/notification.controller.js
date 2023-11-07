@@ -92,9 +92,49 @@ const getSendNotificationALl = async (req, res) => {
     });
   }
 };
+
+const deleteNotificationById = async (req, res) => {
+  // Lấy danh sách thông báo cho người dùng cụ thể
+  const notificationId = req.params.id;
+  try {
+    // Xóa thông báo với notificationId
+    await Notification.findByIdAndDelete(notificationId);
+    // Trả về phản hồi thành công và thông báo đã tạo
+    res
+      .status(200)
+      .json({ success: true, message: "Notification deleted successfully" });
+  } catch (error) {
+    // Trả về phản hồi lỗi nếu có lỗi xảy ra
+    res.status(500).json({
+      success: false,
+      message: "Failed deleted notifications",
+      error: error.message,
+    });
+  }
+};
+
+const getNotificationById = async (req, res) => {
+  const notificationId = req.params.id;
+  try {
+    // Xóa thông báo với notificationId
+    const data = await Notification.findOne({ _id: notificationId });
+    // Trả về phản hồi thành công và thông báo đã tạo
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    // Trả về phản hồi lỗi nếu có lỗi xảy ra
+    res.status(500).json({
+      success: false,
+      message: "Failed get notification by Id",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   postSendNotificationByUserId,
   getSendNotificationByUserId,
   postSendNotificationAll,
   getSendNotificationALl,
+  deleteNotificationById,
+  getNotificationById,
 };
