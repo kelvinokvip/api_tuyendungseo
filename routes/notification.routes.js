@@ -15,7 +15,7 @@ const {
 router.post("/notification/:userId", verifyToken, postSendNotificationByUserId);
 router.get("/notification/:userId", verifyToken, getSendNotificationByUserId);
 router.post("/notification/", verifyToken, postSendNotificationAll);
-router.get("/notification/", getSendNotificationALl);
+router.get("/notification/", verifyToken, getSendNotificationALl);
 router.delete("/notification/:id", verifyToken, deleteNotificationById);
-router.get(`/notificationById/:id`, getNotificationById);
+router.get(`/notificationById/:id`, verifyToken, getNotificationById);
 module.exports = router;
