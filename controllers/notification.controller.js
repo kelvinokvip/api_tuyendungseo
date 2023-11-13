@@ -37,15 +37,15 @@ const getSendNotificationByUserId = async (req, res) => {
     // Lấy danh sách thông báo cho người dùng cụ thể
     let id = userId;
     if (!id) {
-      id = req.user.id;
+      id = req.user.id || req.user._id;
     }
     const notifications = await Notification.find({ userId });
 
     // Trả về danh sách thông báo
-    res.json(notifications);
+    return res.json(notifications);
   } catch (error) {
     // Trả về phản hồi lỗi nếu có lỗi xảy ra
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to get notifications",
       error: error.message,
