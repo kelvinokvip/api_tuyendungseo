@@ -35,6 +35,10 @@ const getSendNotificationByUserId = async (req, res) => {
 
   try {
     // Lấy danh sách thông báo cho người dùng cụ thể
+    let id = userId;
+    if (!id) {
+      id = req.user.id;
+    }
     const notifications = await Notification.find({ userId });
 
     // Trả về danh sách thông báo

@@ -6,7 +6,7 @@ const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
 const Fingerprint = require("express-fingerprint");
-require("./helpers/telegram");
+// require("./helpers/telegram");
 var origin_urls;
 if (process.env.NODE_ENV == "development") {
   origin_urls = [
