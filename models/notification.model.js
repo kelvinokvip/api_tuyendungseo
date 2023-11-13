@@ -23,4 +23,4 @@ const notificationSchema = new mongoose.Schema(
 
 const myDB = mongoose.connection.useDb("micro-user");
 
-module.exports = myDB.model("Notification", notificationSchema);
+module.exports = myDB.model("PostNotification", notificationSchema);
