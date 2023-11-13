@@ -120,10 +120,15 @@ const deleteNotificationById = async (req, res) => {
 const getNotificationById = async (req, res) => {
   const notificationId = req.params.id;
   try {
+    let data;
     // Xóa thông báo với notificationId
-    const data = await Notification.findOne({ _id: notificationId });
+    if (notificationId) {
+      await Notification.findOne({ _id: notificationId });
+    } else {
+      data = [];
+    }
     // Trả về phản hồi thành công và thông báo đã tạo
-    res.status(200).json({ success: true, data });
+    return res.status(200).json({ success: true, data });
   } catch (error) {
     // Trả về phản hồi lỗi nếu có lỗi xảy ra
     res.status(500).json({
