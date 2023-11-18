@@ -7,6 +7,14 @@ const postSendNotificationByUserId = async (req, res) => {
 
   try {
     // Tạo thông báo mới
+    const check = await Notification.findOne({
+      title: title,
+      message: message,
+    });
+
+    if (check) {
+      return res.json({ success: false, message: "Thông báo đã tồn tại!" });
+    }
     const newNotification = await Notification.create({
       userId,
       title,
@@ -82,11 +90,15 @@ const postSendNotificationAll = async (req, res) => {
 
 const getSendNotificationALl = async (req, res) => {
   try {
+    const { pageSize = 10, pageIndex = 1 } = req.query;
     // Lấy danh sách thông báo cho người dùng cụ thể
-    const notifications = await Notification.find();
-
+    const notifications = await Notification.find()
+      .skip((pageIndex - 1) * pageSize)
+      .limit(pageSize);
+    const totalItem = await Notification.countDocuments();
+    const totalPage = Math.ceil(totalItem / pageSize);
     // Trả về danh sách thông báo
-    res.json(notifications);
+    res.json({ data: notifications, totalItem, totalPage });
   } catch (error) {
     // Trả về phản hồi lỗi nếu có lỗi xảy ra
     res.status(500).json({
