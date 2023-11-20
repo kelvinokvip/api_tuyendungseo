@@ -15,10 +15,7 @@ const categorySchema = new mongoose.Schema(
         ref: "Category",
       },
     ],
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-    },
+    users: [{ type: String, ref: "User" }],
     nameNoSign: {
       type: String,
     },

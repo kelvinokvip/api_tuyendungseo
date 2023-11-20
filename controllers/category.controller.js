@@ -2,10 +2,12 @@ const unidecode = require("unidecode");
 const Category = require("../models/category.model");
 // const { createLog } = require("./log.controller");
 const PagedModel = require("../helpers/PagedModel");
+const userModel = require("../models/user.model");
+const { isValidObjectId } = require("mongoose");
 
 const getAll = async (req, res) => {
   try {
-    const data = await Category.find().select('name');
+    const data = await Category.find().select("name");
     //   .select("name price forUser user")
     //   .populate("user", "username")
     //   .populate("forUser", "username");
@@ -77,8 +79,7 @@ const getCateById = async (req, res) => {
 const create = async (req, res) => {
   try {
     const name = req.body.name?.trim();
-    const { parent, description } = req.body;
-    const user = req.user.id;
+    const { parent, description, users } = req.body;
 
     if (!name) {
       return res.json({ success: false, message: "Dữ liệu bị thiếu!" });
@@ -166,4 +167,46 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getCateById, getPaging, create, update, remove };
+const addUsers = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { username } = req.body;
+    // Kiểm tra xem user có tồn tại hay không
+    const user = await userModel.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    // Kiểm tra xem danh mục có tồn tại hay không
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Danh mục không tồn tại" });
+    }
+
+    // Kiểm tra xem ctv đã được thêm hay chưa
+    const checkUser = await Category.findOne({
+      users: user.username,
+    });
+    if (checkUser) {
+      return res.status(404).json({ message: "CTV đã tồn tại" });
+    }
+    // Thêm người dùng vào danh mục
+    category.users.push(user.username);
+    await category.save();
+
+    res.status(201).json({ message: "Đã thêm người dùng vào danh mục" });
+  } catch (error) {
+    console.error("Lỗi khi thêm người dùng vào danh mục:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi" });
+  }
+};
+
+module.exports = {
+  getAll,
+  getCateById,
+  getPaging,
+  create,
+  update,
+  remove,
+  addUsers,
+};
