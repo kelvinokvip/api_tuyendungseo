@@ -4,7 +4,7 @@ const authorize = require("../middlewares/authorize.middlewares");
 const { verifyToken } = require("../middlewares/auth");
 
 const {
-  postSendNotificationByUserId,
+  postSendNotification,
   getSendNotificationByUserId,
   postSendNotificationAll,
   getSendNotificationALl,
@@ -12,9 +12,8 @@ const {
   getNotificationById,
 } = require("../controllers/notification.controller");
 
-router.post("/notification/:userId", verifyToken, postSendNotificationByUserId);
+router.post("/notification", postSendNotification);
 router.get("/notification/:userId", verifyToken, getSendNotificationByUserId);
-router.post("/notification/", verifyToken, postSendNotificationAll);
 router.get("/notification/", verifyToken, getSendNotificationALl);
 router.delete("/notification/:id", verifyToken, deleteNotificationById);
 router.get(`/notificationById/:id`, verifyToken, getNotificationById);

@@ -9,14 +9,19 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userId: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-    },
+    userIds: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+      }
+    ],
     type: {
-      type: Boolean,
+      type: String,
       required: true,
     },
+    category: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
