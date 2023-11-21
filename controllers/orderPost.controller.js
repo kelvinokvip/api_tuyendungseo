@@ -30,7 +30,7 @@ const getRandomOrderForPostByCate = async (req, res) => {
       };
     }
 
-    let data = await OrderPost.find(initQuery).select("require");
+    let data = await OrderPost.find(initQuery).select("require user");
     let randomData = lodash.sampleSize(data, count);
 
     return res.json(randomData);
