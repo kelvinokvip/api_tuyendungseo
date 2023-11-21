@@ -1,6 +1,6 @@
 const Notification = require("../models/notification.model");
 const User = require("../models/user.model");
-const OrderPost = require("../models/order.model");
+const Post = require("../models/post.model");
 
 // Định nghĩa API endpoint để nhận yêu cầu gửi thông báo cho người dùng
 const postSendNotification = async (req, res) => {
@@ -45,11 +45,8 @@ const postSendNotification = async (req, res) => {
       if(!category){
         return res.json({ success: false, message: "Chuyên mục ko được định nghĩa" });
       }
-      let data = await OrderPost.find({}).select("require user");
-      data = data.filter(item => {
-        return item.require.category == category; 
-      })
-      const ids = data.map(item => item.user)
+      let data = await Post.find({category: category}).select("receive");
+      const ids = data.map(item => item.receive.user)
       newNotification = await Notification.create({
         userIds: ids,
         title,
