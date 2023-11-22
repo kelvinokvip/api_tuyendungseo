@@ -53,6 +53,44 @@ const randomSkip = (count, pageSize) => {
   }
 };
 
+const createOrderPost =  async (req, res) => {
+  const {title, description, category, keywords, words, user} = req.body;
+  try {
+   const data =  await OrderPost.create({
+      require: {
+        title,
+        description,
+        category,
+        keywords,
+        words
+      },
+      user
+    })
+    return res.json({ success: true, message: "Tạo order post success", data });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
+
+
+const getPagingOrderPost =  async (req, res) => {
+  try {
+   const data =  await OrderPost.find({});
+    return res.json(data);
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
 module.exports = {
   getRandomOrderForPostByCate,
+  createOrderPost,
+  getPagingOrderPost
 };

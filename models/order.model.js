@@ -54,6 +54,6 @@ const OrderPostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const myDB = mongoose.connection.useDb("micro-orders");
+const myDB = mongoose.connection.useDb("micro-posts");
 
 module.exports = myDB.model("OrderPost", OrderPostSchema);

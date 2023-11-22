@@ -87,6 +87,7 @@ const authRoute = require("./routes/auth.routes");
 const permissionRoute = require("./routes/permission.routes");
 const categoryRoute = require("./routes/category.routes");
 const postRoute = require("./routes/post.routes");
+const orderRoute = require("./routes/order.routes");
 const userRoute = require("./routes/user.routes");
 const notificationRoute = require("./routes/notification.routes");
 
@@ -94,5 +95,6 @@ app.use("/api", categoryRoute);
 app.use("/api", authRoute);
 app.use("/api/permission", permissionRoute);
 app.use("/api/post", postRoute);
+app.use("/api/order-post", orderRoute);
 app.use("/api/user", userRoute);
 app.use("/api", notificationRoute);
