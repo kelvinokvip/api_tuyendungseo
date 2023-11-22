@@ -98,7 +98,7 @@ const create = async (req, res) => {
       name,
       parent,
       description,
-      user,
+      users,
       nameNoSign: unidecode(name).toLocaleLowerCase(),
     });
 

@@ -29,11 +29,24 @@ const login = async (req, res) => {
       });
     }
     if (user.isVerify === 0) {
-      return res.json({
-        success: false,
-        message:
-          "Tài khoản của bạn bị khóa, vui lòng liên hệ quản trị viên để biết thêm chi tiết!",
-      });
+      switch (user.status) {
+        case 0:
+          return res.json({
+            success: false,
+            message:
+              "Tài khoản của bạn bị khóa, vui lòng liên hệ quản trị viên để biết thêm chi tiết!",
+          });
+          break;
+        case 1:
+            return res.json({
+              success: false,
+              message:
+                "Tài khoản của bạn đã được duyệt, vui lòng chuyển hướng login về https://seo.okvip.vin!",
+            });
+            break;
+        default:
+          break;
+      }
     }
     // if (user.status === 1 ) {
     //   return res.json({
