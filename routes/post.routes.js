@@ -16,12 +16,10 @@ const {
   updateStatusPost,
   receiveRandomPost,
 } = require("../controllers/post.controller");
-const {
-  getRandomOrderForPostByCate,
-} = require("../controllers/orderPost.controller");
+
 
 router.get("/", verifyToken, getPagingPost);
-router.get("/random", verifyToken, getRandomOrderForPostByCate);
+
 router.get("/my-post", verifyToken, getMyPost);
 router.get("/:id", verifyToken, getById);
 router.post("/", verifyToken, create);
