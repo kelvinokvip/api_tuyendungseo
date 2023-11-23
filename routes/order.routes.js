@@ -11,8 +11,6 @@ const {
   sortOrderPost
 } = require("../controllers/orderPost.controller");
 
-
-
 router.get("/random", verifyToken, getRandomOrderForPostByCate);
 router.get("/getOrderPost", verifyToken, getAllOrderPost);
 router.post("/create", verifyToken, createOrderPost);

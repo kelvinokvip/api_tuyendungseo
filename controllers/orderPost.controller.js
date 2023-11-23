@@ -20,7 +20,7 @@ const getRandomOrderForPostByCate = async (req, res) => {
       },
       // category:{$not:{$in:["Guestpost","GP","guestpost"]}},
       // status:{$in: [-5,-4]},
-      _id:{$not: {$in: allPost?.map(item => item.order)}}
+      // _id:{$not: {$in: allPost?.map(item => item.order)}}
     };
 
     if (allCate.find((item) => item.name === category)) {

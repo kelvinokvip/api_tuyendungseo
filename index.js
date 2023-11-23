@@ -90,6 +90,7 @@ const postRoute = require("./routes/post.routes");
 const orderRoute = require("./routes/order.routes");
 const userRoute = require("./routes/user.routes");
 const notificationRoute = require("./routes/notification.routes");
+const orderEntityRoute = require("./routes/orderEntity.routes");
 
 app.use("/api", categoryRoute);
 app.use("/api", authRoute);
@@ -98,3 +99,4 @@ app.use("/api/post", postRoute);
 app.use("/api/order-post", orderRoute);
 app.use("/api/user", userRoute);
 app.use("/api", notificationRoute);
+app.use("/api", orderEntityRoute);

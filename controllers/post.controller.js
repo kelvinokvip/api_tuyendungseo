@@ -396,6 +396,7 @@ const getMyPost = async (req, res) => {
     const pageIndex = req.query.pageIndex || 1;
     const search = req.query.search;
     const status = req.query.status;
+    const isOrder = req.query.isOrder;
     let searchQuery = {
       "receive.user": user,
     };
@@ -406,6 +407,10 @@ const getMyPost = async (req, res) => {
 
     if (status) {
       searchQuery.status = status;
+    }
+
+    if (isOrder) {
+      searchQuery.isOrder = isOrder;
     }
 
     const data = await Post.find(searchQuery)
@@ -447,15 +452,11 @@ const startPost = async (req, res) => {
         message: "Bạn không có quyền viết bài này",
       });
     }
+
     if (!post.receive?.deadline) {
-      post.receive.deadline = moment()
-        .add(post.timer, "hour")
-
-        .toISOString();
-
+      post.receive.deadline = moment().add(post.timer, "hour").toISOString();
       await post.save();
     }
-
     return res.json({ success: true, message: "Bắt đầu viết bài!", post });
   } catch (error) {
     return res.json({ success: false, message: "Internal server error!" });
