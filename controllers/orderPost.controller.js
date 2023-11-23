@@ -1,5 +1,6 @@
 const { convertToAccentedStringVietnamese } = require("../helpers/regexMaker");
 const OrderPost = require("../models/order.model");
+const sortOrder = require("../models/sortOrder.model");
 const Category = require("../models/category.model");
 const Post = require("../models/post.model");
 const moment = require("moment");
@@ -35,7 +36,6 @@ const getRandomOrderForPostByCate = async (req, res) => {
 
     return res.json(randomData);
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Internal server error",
@@ -54,18 +54,24 @@ const randomSkip = (count, pageSize) => {
 };
 
 const createOrderPost =  async (req, res) => {
-  const {title, description, category, keywords, words, user} = req.body;
+  const {title, description, category, keywords, words} = req.body;
   try {
    const data =  await OrderPost.create({
       require: {
         title,
         description,
         category,
-        keywords,
+        keywords: keywords.toString().split(","),
         words
       },
-      user
+      user: req.user._id
     })
+    let dataSort = await sortOrder.findOne({name: "sort-order"});
+    if(!dataSort){
+      dataSort = await sortOrder.create({name: "sort-order"})
+    }
+    dataSort.sort.unshift(data._id);
+    await dataSort.save();
     return res.json({ success: true, message: "Tạo order post success", data });
   } catch (error) {
     return res.json({
@@ -77,10 +83,11 @@ const createOrderPost =  async (req, res) => {
 }
 
 
-const getPagingOrderPost =  async (req, res) => {
+const getAllOrderPost =  async (req, res) => {
   try {
-   const data =  await OrderPost.find({});
-    return res.json(data);
+   const data =  await OrderPost.find({}).lean();
+   const sort =  await sortOrder.findOne({name: "sort-order"}).lean();
+    return res.json({data,  sort: sort || []});
   } catch (error) {
     return res.json({
       success: false,
@@ -89,8 +96,81 @@ const getPagingOrderPost =  async (req, res) => {
     });
   }
 }
+
+const updateOrderPost =  async (req, res) => {
+  const {title, description, category, keywords, words} = req.body;
+  try {
+    const post = await OrderPost.findById(req.params.id)
+    if(!post){
+      return res.json({ success: false, message: "post không tìm thấy" });
+    }
+    post.require = {
+      title,
+      description,
+      category,
+      keywords: keywords.toString().split(","),
+      words
+    };
+    await post.save();
+    return res.json({ success: true, message: "Update order post success" });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
+
+const deleteOrderPost =  async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await OrderPost.findOneAndDelete({ _id: id });
+    let dataSort = await sortOrder.findOne({name: "sort-order"});
+    if(dataSort){
+      dataSort.sort = dataSort.sort.filter(i => i.toString() !== id)
+      dataSort.save()
+    }
+    if (!result) {
+      return res.json({ success: false, message: "Bài viết không tồn tại!" });
+    } else {
+      return res.json({ success: true, message: "Xóa thành công!" });
+    }
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
+const sortOrderPost =  async (req, res) => {
+  try {
+      let dataSort = await sortOrder.findOne({name: "sort-order"});
+      if(!dataSort){
+        dataSort = await sortOrder.create({name: "sort-order"})
+      }
+      if(!req.body.sort){
+        return res.json({ success: false, message: "data sort bị thiếu"});
+      }
+      dataSort.sort = req.body.sort
+      await dataSort.save()
+      res.json({ success: true, message: "sort order success" });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
+
 module.exports = {
   getRandomOrderForPostByCate,
   createOrderPost,
-  getPagingOrderPost
+  getAllOrderPost,
+  deleteOrderPost,
+  updateOrderPost,
+  sortOrderPost
 };
