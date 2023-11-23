@@ -54,7 +54,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.set("trust proxy", true);
-app.use(express.urlencoded({ limit: "100mb", parameterLimit: 500000000 }));
+// app.use(express.urlencoded({ limit: "100mb", parameterLimit: 500000000 }));
 
 const server = require("http").createServer(app);
 
