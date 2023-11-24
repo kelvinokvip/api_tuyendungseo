@@ -261,7 +261,6 @@ const receiveRandomPost = async (req, res) => {
   try {
     const user = req.user.id;
     const category = req.body.category;
-    console.log(category);
     const checkCurrent = await Post.findOne({
       status: { $in: [0] },
       "receive.user": req.user.id,
@@ -301,9 +300,10 @@ const receiveRandomPost = async (req, res) => {
       category: randomData[0].require.category,
       keywords: randomData[0]?.require?.keywords,
       status: 0,
-      timer: 2,
+      timer: 2, // cố định 120p
       order: randomData[0]?._id,
-      word: randomData[0]?.require?.words,
+      // word: randomData[0]?.require?.words,
+      word: 1000, // cố định bài viết >= 1000 từ
       receive: {
         user: user,
         receiveTime: moment().toISOString(),
