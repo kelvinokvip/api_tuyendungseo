@@ -1,6 +1,7 @@
 const OrderEntity = require("../models/orderEntity.model");
-const PagedModel = require("../helpers/PagedModel");
+const User = require("../models/user.model");
 const Post = require("../models/post.model");
+const PagedModel = require("../helpers/PagedModel");
 const lodash = require("lodash");
 const unidecode = require("unidecode");
 const moment = require("moment");
@@ -171,11 +172,12 @@ const receiveRandomEntity = async (req, res) => {
         message: "Không còn bài viết để nhận!",
       });
     }
+
     const data = new Post({
       title: randomData[0].title,
       description: randomData[0].content,
       status: 0,
-      timer: 1,
+      timer: 2,
       order: randomData[0]?._id,
       isOrder: true,
       receive: {

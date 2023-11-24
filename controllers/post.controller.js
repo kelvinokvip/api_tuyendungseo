@@ -14,6 +14,8 @@ const getPagingPost = async (req, res) => {
     const search = req.query.search;
     const category = req.query.category;
     const status = req.query.status;
+    const isOrder = req.query.isOrder;
+
     let searchObject = {};
     let aggregationPipeline = [];
 
@@ -32,6 +34,10 @@ const getPagingPost = async (req, res) => {
 
     if (category) {
       searchObject.category = category;
+    }
+
+    if (isOrder) {
+      searchObject.isOrder = JSON.parse(isOrder);
     }
 
     aggregationPipeline.push({ $match: searchObject });

@@ -36,14 +36,12 @@ const login = async (req, res) => {
             message:
               "Tài khoản của bạn bị khóa, vui lòng liên hệ quản trị viên để biết thêm chi tiết!",
           });
-          break;
-        case 1:
-            return res.json({
-              success: false,
-              message:
-                "Tài khoản của bạn đã được duyệt, vui lòng chuyển hướng login về https://seo.okvip.vin!",
-            });
-            break;
+        // case 1:
+        //     return res.json({
+        //       success: false,
+        //       message:
+        //         "Tài khoản của bạn đã được duyệt, vui lòng chuyển hướng login về https://seo.okvip.vin!",
+        //     });
         default:
           break;
       }
@@ -82,7 +80,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, password } = req.body;
+    const { firstName, lastName, username, password, isUser } = req.body;
     const check = await User.findOne({
       username: username.toLowerCase().trim(),
     });
@@ -90,7 +88,7 @@ const register = async (req, res) => {
       return res.json({ success: false, message: "Tên đăng nhập đã tồn tại!" });
     }
     const role = await Role.findOne({
-      name: { $regex: ".*" + "CTV" + ".*" },
+      name: isUser == "1" ? 'CTV (entity)' : 'CTV (Content)'
     });
     const ipAddress = req.ip;
     const user = new User({
@@ -101,6 +99,7 @@ const register = async (req, res) => {
       role: role._id,
       status: 0,
       isVerify: 1,
+      isUser
     });
     const userDetail = await user.save();
     userDetail.role = role;
@@ -129,7 +128,7 @@ const register = async (req, res) => {
 //Login with google
 const loginWithGoogle = async (req, res, next) => {
   try {
-    const { tokenId } = req.body;
+    const { tokenId, isUser } = req.body;
 
     const verifyToken = await axios({
       method: "GET",
@@ -153,7 +152,7 @@ const loginWithGoogle = async (req, res, next) => {
       if (!checkValidEmail) {
         //
         const role = await Role.findOne({
-          name: { $regex: ".*" + "CTV" + ".*" },
+          name: isUser == "1" ? 'CTV (entity)' : 'CTV (Content)'
         });
         const user = new User({
           firstName: given_name,
@@ -165,6 +164,7 @@ const loginWithGoogle = async (req, res, next) => {
           role: role._id,
           status: 0,
           isVerify: 1,
+          isUser: isUser
         });
         const userDetail = await user.save();
         userDetail.role = role;
