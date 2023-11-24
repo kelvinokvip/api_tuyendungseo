@@ -15,6 +15,7 @@ const {
   startPost,
   updateStatusPost,
   receiveRandomPost,
+  updateDeadlinePost
 } = require("../controllers/post.controller");
 
 
@@ -25,6 +26,7 @@ router.get("/:id", verifyToken, getById);
 router.post("/", verifyToken, create);
 router.post("/receive/random", verifyToken, receiveRandomPost);
 router.post("/receive/:id", verifyToken, receivePost);
+router.put("/update-deadline/:id", verifyToken, updateDeadlinePost);
 router.put("/finish/:id", verifyToken, finishPost);
 router.put("/start/:id", verifyToken, startPost);
 router.put("/:id", verifyToken, updateStatusPost);

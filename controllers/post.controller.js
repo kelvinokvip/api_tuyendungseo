@@ -266,7 +266,7 @@ const receivePost = async (req, res) => {
 const receiveRandomPost = async (req, res) => {
   try {
     const user = req.user.id;
-    const category = req.query.category;
+    const category = req.body.category;
     const checkCurrent = await Post.findOne({
       status: { $in: [0] },
       "receive.user": req.user.id,
@@ -274,40 +274,42 @@ const receiveRandomPost = async (req, res) => {
     if (checkCurrent) {
       return res.json({ success: false, message: "Bạn còn bài đang viết!" });
     }
+    const checkPost = await Post.findOne({
+      "receive.user": req.user.id
+    });
+    if (checkPost) {
+      return res.json({ success: false, message: "Mỗi tài khoản chỉ được làm bài test một lần" });
+    }
 
-    const allPost = await Post.find().select("order");
+    const allPost = await Post.find({status: 0}).select("order");
 
-    let initQuery = {
-      createdAt: {
-        $gte: moment().subtract(30, "day").startOf("day").toISOString(),
-      },
-      category:
-        category !== "all"
-          ? { $regex: category, $options: "i" }
-          : { $not: { $in: ["Guestpost", "GP", "guestpost"] } },
-      status: { $in: [-5, -4] },
-      _id: { $not: { $in: allPost?.map((item) => item.order) } },
+    let initQuery = {  
+      "require.category": { $regex: category, $options: "i" },
+      _id: { $nin: allPost?.map((item) => item.order) },
     };
 
     let data = await OrderPost.find(initQuery).select("require").lean();
-
-    let randomData = lodash.sampleSize(data, 1);
-    console.log(randomData, "jaskldjsalkjdklasd");
-    if (randomData?.length === 0) {
-      return res.json({
-        success: false,
-        message: "Không còn bài viết để nhận!",
-      });
+    if (data?.length === 0) {
+      data = await OrderPost.find({"require.category": { $regex: category, $options: "i" }}).select("require").lean();
+      if(data?.length === 0){
+        return res.json({
+          success: false,
+          message: "Không còn bài viết để nhận!",
+        });
+      }
     }
+    let randomData = lodash.sampleSize(data, 1);
+ 
     const newPost = new Post({
       title: randomData[0].require.title,
       description: randomData[0].require.description,
       category: randomData[0].require.category,
       keywords: randomData[0]?.require?.keywords,
       status: 0,
-      timer: 3,
+      timer: 2, // cố định 120p
       order: randomData[0]?._id,
-      word: randomData[0]?.require?.words,
+      // word: randomData[0]?.require?.words,
+      word: 1000, // cố định bài viết >= 1000 từ
       receive: {
         user: user,
         receiveTime: moment().toISOString(),
@@ -325,7 +327,7 @@ const receiveRandomPost = async (req, res) => {
     return res.json({
       success: true,
       message: "Nhận bài viết thành công!",
-      newPost,
+      // newPost,
     });
   } catch (error) {
     console.log(error);
@@ -460,8 +462,8 @@ const startPost = async (req, res) => {
     }
 
     if (!post.receive?.deadline) {
-      post.receive.deadline = moment().add(post.timer, "hour").toISOString();
-      await post.save();
+        post.receive.deadline = moment().add(post.timer, "hour").add(5, "minutes").toISOString();
+        await post.save();
     }
     return res.json({ success: true, message: "Bắt đầu viết bài!", post });
   } catch (error) {
@@ -540,6 +542,27 @@ const updateStatusPost = async (req, res) => {
     return res.json({ success: false, message: error.message });
   }
 };
+const updateDeadlinePost = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const post = await Post.findOne({ _id: id });
+    if (!post) {
+      return res.json({ success: false, message: "Bài viết không tồn tại!" });
+    }
+
+    post.receive.deadline = moment().add(post.timer, "hour");
+    await post.save();
+
+    return res.json({ success: true, post });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: "Internal server error!",
+      error,
+    });
+  }
+};
 module.exports = {
   getPagingPost,
   create,
@@ -553,4 +576,5 @@ module.exports = {
   checkExpiresPost,
   updateStatusPost,
   receiveRandomPost,
+  updateDeadlinePost
 };
