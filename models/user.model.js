@@ -104,6 +104,11 @@ const userSchema = new mongoose.Schema(
       default: 1,
       enum: [0, 1],
     },
+    isUser: {
+      type: Number,
+      default: 0,
+      enum: [0, 1],//0 = content, 1 = entity
+    },
   },
   { timestamps: true }
 );

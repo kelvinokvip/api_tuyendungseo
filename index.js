@@ -54,7 +54,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.set("trust proxy", true);
-app.use(express.urlencoded({ limit: "100mb", parameterLimit: 500000000 }));
+// app.use(express.urlencoded({ limit: "100mb", parameterLimit: 500000000 }));
 
 const server = require("http").createServer(app);
 
@@ -90,6 +90,7 @@ const postRoute = require("./routes/post.routes");
 const orderRoute = require("./routes/order.routes");
 const userRoute = require("./routes/user.routes");
 const notificationRoute = require("./routes/notification.routes");
+const orderEntityRoute = require("./routes/orderEntity.routes");
 
 app.use("/api", categoryRoute);
 app.use("/api", authRoute);
@@ -98,3 +99,4 @@ app.use("/api/post", postRoute);
 app.use("/api/order-post", orderRoute);
 app.use("/api/user", userRoute);
 app.use("/api", notificationRoute);
+app.use("/api", orderEntityRoute);

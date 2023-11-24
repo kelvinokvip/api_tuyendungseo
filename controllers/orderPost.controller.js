@@ -18,17 +18,17 @@ const getRandomOrderForPostByCate = async (req, res) => {
       createdAt: {
         $gte: moment().subtract(30, "day").startOf("day").toISOString(),
       },
-      category:{$not:{$in:["Guestpost","GP","guestpost"]}},
-      status:{$in: [-5,-4]},
-      _id:{$not: {$in: allPost?.map(item => item.order)}}
+      // category:{$not:{$in:["Guestpost","GP","guestpost"]}},
+      // status:{$in: [-5,-4]},
+      // _id:{$not: {$in: allPost?.map(item => item.order)}}
     };
 
     if (allCate.find((item) => item.name === category)) {
       initQuery["require.category"] = { $regex: category, $options: "i" };
     } else {
-      initQuery["require.category"] = {
-        $not: { $in: allCate.map((item) => item.name) },
-      };
+      // initQuery["require.category"] = {
+      //   $not: { $in: allCate.map((item) => item.name) },
+      // };
     }
 
     let data = await OrderPost.find(initQuery).select("require user");

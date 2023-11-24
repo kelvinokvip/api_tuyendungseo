@@ -72,6 +72,10 @@ const postSchema = new mongoose.Schema(
     nameNoSign: {
       type: String,
     },
+    isOrder:{
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );
