@@ -465,6 +465,32 @@ const startPost = async (req, res) => {
         post.receive.deadline = moment().add(post.timer, "hour").add(5, "minutes").toISOString();
         await post.save();
     }
+    
+    return res.json({ success: true, message: "Bắt đầu viết bài!", post });
+  } catch (error) {
+    return res.json({ success: false, message: "Internal server error!" });
+  }
+};
+
+const startPostEntity = async (req, res) => {
+  try {
+    const postid = req.params.id;
+    const user = req.user.id;
+    const post = await Post.findOne({ "receive.user": user, _id: postid });
+
+    if (!post) {
+      return res.json({
+        success: false,
+        message: "Bạn không có quyền viết bài này",
+      });
+    }
+
+    if (!post.receive?.deadline) {
+        post.receive.deadline = moment().add(post.timer, "hour").toISOString();
+        await post.save();
+    }
+
+    
     return res.json({ success: true, message: "Bắt đầu viết bài!", post });
   } catch (error) {
     return res.json({ success: false, message: "Internal server error!" });
@@ -576,5 +602,6 @@ module.exports = {
   checkExpiresPost,
   updateStatusPost,
   receiveRandomPost,
-  updateDeadlinePost
+  updateDeadlinePost,
+  startPostEntity
 };

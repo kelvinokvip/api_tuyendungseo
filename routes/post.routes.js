@@ -15,7 +15,8 @@ const {
   startPost,
   updateStatusPost,
   receiveRandomPost,
-  updateDeadlinePost
+  updateDeadlinePost,
+  startPostEntity
 } = require("../controllers/post.controller");
 
 
@@ -28,7 +29,8 @@ router.post("/receive/random", verifyToken, receiveRandomPost);
 router.post("/receive/:id", verifyToken, receivePost);
 router.put("/update-deadline/:id", verifyToken, updateDeadlinePost);
 router.put("/finish/:id", verifyToken, finishPost);
-router.put("/start/:id", verifyToken, startPost);
+router.put("/start/:id", verifyToken, startPost)
+router.put("/start-entity/:id", verifyToken, startPostEntity);
 router.put("/:id", verifyToken, updateStatusPost);
 router.delete("/:id", verifyToken, remove);
 module.exports = router;
