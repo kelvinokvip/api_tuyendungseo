@@ -5,7 +5,9 @@ const config = require("../config/auth.config");
 const RefreshToken = require("../models/refreshToken.model");
 const crypto = require("crypto");
 const Role = require("../models/role.model");
+const confirmCode = require("../models/confirmCode.modal");
 const axios = require("axios");
+const sendEmail = require("../helpers/sendEmail");
 
 const login = async (req, res) => {
   try {
@@ -80,12 +82,26 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, password, isUser } = req.body;
+    const { firstName, lastName, username, password, isUser, email, code, telegram } = req.body;
     const check = await User.findOne({
       username: username.toLowerCase().trim(),
     });
     if (check) {
       return res.json({ success: false, message: "Tên đăng nhập đã tồn tại!" });
+    }
+    if(!email){
+      return res.json({ success: false, message: "Chưa có email" });
+    }
+    const checkGmail = await User.findOne({
+      email: email,
+    });
+    if(checkGmail){
+      return res.json({ success: false, message: "Email đã tồn tại" });
+    }
+    const checkcode = await confirmCode.findOne({code: code, email: email, status: false});
+
+    if(!checkcode){
+      return res.json({ success: false, message: "Code xác nhận không đúng" });
     }
     const role = await Role.findOne({
       name: isUser == "1" ? 'CTV (entity)' : 'CTV (Content)'
@@ -99,9 +115,13 @@ const register = async (req, res) => {
       role: role._id,
       status: 0,
       isVerify: 1,
-      isUser
+      isUser,
+      email,
+      telegram
     });
     const userDetail = await user.save();
+    checkcode.status = true;
+    checkcode.save();
     userDetail.role = role;
     const jwtToken = generateJwtToken(userDetail);
     const refreshToken = generateRefreshToken(user, ipAddress);
@@ -332,4 +352,36 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { login, register, loginWithGoogle, loggedUser, refreshToken };
+const sendCodeEmail = async (req, res) => {
+ 
+  try {
+    const email = req.body.email;
+    if(!email){
+      return res.json({ success: false,message: "Email chưa có"});
+    }
+    const e = await confirmCode.findOne({email: email});
+    if(e && e.status){
+      return res.json({ success: false,message: "Email đã có"});
+    }
+    const data = await sendEmail(email);
+    if(data.success){
+      if(e){
+        e.code = data.code;
+        e.save()
+      }else{
+        await confirmCode.create({
+          email: email,
+          code: data.code
+        }) 
+      }
+
+      return res.json({ success: true, message: "Gửi gmail thành công"});
+    }else {
+      return res.json({ success: false, message: "Có lỗi xảy ra khi gửi email"});
+    }
+  } catch (error) {
+    
+  }
+}
+
+module.exports = { login, register, loginWithGoogle, loggedUser, refreshToken, sendCodeEmail };

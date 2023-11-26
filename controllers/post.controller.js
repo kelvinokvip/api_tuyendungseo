@@ -532,10 +532,13 @@ const updateStatusPost = async (req, res) => {
     }
     if(status == 2){
       const title = "KẾT QUẢ BÀI VIẾT"
-      const message = `<div><span style="color: rgb(255, 0, 0); font-weight: bold;">ĐẠT</span><span style="">. 
-      Chào mừng bạn tham gia vào hệ thống CTV của OKVIP. Tài khoản này đã được liên kết với trang web </span><span style="">https://seo.okvip.vin/</span><span style=""> 
-      Liên hệ hỗ trợ qua nhóm telegram: https://t.me/freelancer_okvip
-      </span></div>`
+      const message = `<div><span>Kết quả bài viết của bạn:</span><span style="color: rgb(255, 0, 0); font-weight: bold;">ĐẠT</span>.</br><span style=""> 
+      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng truy cập vào website seo.okvip.vin bằng tài khoản này để bắt đầu nhận bài viết. Mọi thắc mắc liên hệ qua nhóm telegram </span>
+      <a href="https://t.me/+Wr1vjhmjh7dhMTk1"style="color: rgb(17, 85, 204)">https://t.me/+Wr1vjhmjh7dhMTk1</a>
+      </div>
+      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
+      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
+      `
       await Notification.create({
         userIds: [post.receive.user],
         title,
@@ -546,7 +549,10 @@ const updateStatusPost = async (req, res) => {
     if(status == -2){
       const title = "KẾT QUẢ BÀI VIẾT"
       const message = `<div><span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold;">KHÔNG ĐẠT</span><span style="">. Lưu ý: Mỗi tài khoản chỉ được tham gia bài test một lần!
-      </span></div>`
+      </span>
+      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
+      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
+      </div>`
       await Notification.create({
         userIds: [post.receive.user],
         title,

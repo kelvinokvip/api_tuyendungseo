@@ -7,6 +7,7 @@ const {
   loginWithGoogle,
   loggedUser,
   refreshToken,
+  sendCodeEmail
 } = require("../controllers/auth.controller");
 const { verifyToken } = require("../middlewares/auth");
 
@@ -15,4 +16,5 @@ router.post("/register", register);
 router.post("/loginWithGoogle", loginWithGoogle);
 router.post("/logged", verifyToken, loggedUser);
 router.post("/user/refresh-token", refreshToken);
+router.post("/sendCodeEmail", sendCodeEmail);
 module.exports = router;
