@@ -87,7 +87,7 @@ const getAllOrderPost =  async (req, res) => {
   try {
    const data =  await OrderPost.find({}).lean();
    const sort =  await sortOrder.findOne({name: "sort-order"}).lean();
-    return res.json({data,  sort: sort || []});
+    return res.json({data,  sort: sort || {}});
   } catch (error) {
     return res.json({
       success: false,

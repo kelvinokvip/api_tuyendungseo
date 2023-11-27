@@ -21,9 +21,9 @@ const postSendNotification = async (req, res) => {
     }
     if(type == 1){
       const allUsers = await User.find({}).select("_id").lean();
-      const ids = allUsers.map(item => item._id)
+      const ids = allUsers.map(item => ({id: item._id}))
       newNotification = await Notification.create({
-        userIds: ids,
+        users: ids,
         title,
         message,
         type,
@@ -33,9 +33,9 @@ const postSendNotification = async (req, res) => {
       if(!users?.length > 0){
         return res.json({ success: false, message: "CTV ko được định nghĩa" });
       }
-      const ids = users.map(item => item.value)
+      const ids = users.map(item => ({id: item.value}))
       newNotification = await Notification.create({
-        userIds: ids,
+        users: ids,
         title,
         message,
         type,
@@ -46,9 +46,9 @@ const postSendNotification = async (req, res) => {
         return res.json({ success: false, message: "Chuyên mục ko được định nghĩa" });
       }
       let data = await Post.find({category: category}).select("receive");
-      const ids = data.map(item => item.receive.user)
+      const ids = data.map(item => ({id: item.receive.user}))
       newNotification = await Notification.create({
-        userIds: ids,
+        users: ids,
         title,
         message,
         type,
@@ -82,7 +82,7 @@ const getSendNotificationByUserId = async (req, res) => {
     if (!id) {
       id = req.user.id || req.user._id;
     }
-    const notifications = await Notification.find({ 'userIds': { $in: userId } });
+    const notifications = await Notification.find({ 'users.id': { $in: userId } }).sort({createdAt: 'desc'});
 
     // Trả về danh sách thông báo
     return res.json(notifications);
@@ -185,7 +185,29 @@ const getNotificationById = async (req, res) => {
     });
   }
 };
-
+const updateNotificationReaded = async (req, res) => {
+  const notificationId = req.params.id;
+  const userid = req.user.id;
+  try {
+    const data = await Notification.findById(notificationId);
+    data.users = data.users.map(user => {
+      if(user.id == userid){
+        return {...user, readed: true}
+      }else {
+        return user
+      }
+    })
+    await data.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Notification update readed successfully", data });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
 module.exports = {
   postSendNotification,
   getSendNotificationByUserId,
@@ -193,4 +215,5 @@ module.exports = {
   getSendNotificationALl,
   deleteNotificationById,
   getNotificationById,
+  updateNotificationReaded
 };

@@ -9,10 +9,16 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userIds: [
+    users: [
       {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
+        id: {
+          type: mongoose.Types.ObjectId,
+          ref: "User",
+        },
+        readed: {
+          type: Boolean,
+          default: false
+        }
       }
     ],
     type: {
