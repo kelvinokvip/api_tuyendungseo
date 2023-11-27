@@ -51,9 +51,7 @@ const getPagingPost = async (req, res) => {
         });
         aggregationPipeline.push({
           $addFields: {
-            timeDifference: {
-              $subtract: ["$receive.finishTime", "$receive.receiveTime"],
-            },
+            timeDifference: "$receive.finishTime",
           },
         });
         aggregationPipeline.push({ $sort: { timeDifference: 1 } });
@@ -540,7 +538,7 @@ const updateStatusPost = async (req, res) => {
       <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
       `
       await Notification.create({
-        userIds: [post.receive.user],
+        users: [{id: post.receive.user}],
         title,
         message,
         type: "2",
@@ -554,7 +552,7 @@ const updateStatusPost = async (req, res) => {
       <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
       </div>`
       await Notification.create({
-        userIds: [post.receive.user],
+        users: [{id: post.receive.user}],
         title,
         message,
         type: "2"
