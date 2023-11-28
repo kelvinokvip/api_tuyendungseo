@@ -9,16 +9,16 @@ const Notification = require("../models/notification.model");
 
 const getPagingPost = async (req, res) => {
   try {
-    const pageSize = parseInt(req.query.pageSize) || 10;
-    const pageIndex = parseInt(req.query.pageIndex) || 1;
+    const pageSize = req.query.pageSize || 10;
+    const pageIndex = req.query.pageIndex || 1;
     const search = req.query.search;
     const category = req.query.category;
     const status = req.query.status;
     const isOrder = req.query.isOrder;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
 
     let searchObject = {};
-    let aggregationPipeline = [];
-
     if (search) {
       searchObject = {
         $or: [
@@ -35,50 +35,49 @@ const getPagingPost = async (req, res) => {
     if (category) {
       searchObject.category = category;
     }
-
+    if (status) {
+      searchObject.status = status;
+    }
     if (isOrder) {
       searchObject.isOrder = JSON.parse(isOrder);
     }
 
-    aggregationPipeline.push({ $match: searchObject });
-
-    if (status) {
-      if (status == 5) {
-        aggregationPipeline.push({
-          $match: {
-            status: { $in: [1, 2, -2] },
-          },
-        });
-        aggregationPipeline.push({
-          $addFields: {
-            timeDifference: "$receive.finishTime",
-          },
-        });
-        aggregationPipeline.push({ $sort: { timeDifference: 1 } });
-      } else {
-        aggregationPipeline.push({
-          $match: {
-            status: parseInt(status),
-          },
-        });
-        aggregationPipeline.push({ $sort: { createdAt: -1 } });
+    if(startDate && endDate) {
+      const start = new Date(moment(startDate))
+      const end= new Date(moment(endDate))
+      console.log(start, end)
+      end.setHours(23, 59, 59, 999);
+      searchObject["receive.finishTime"] = {
+        $gte: start,
+        $lte: end
       }
     }
+   
+    let data = await Post.find(searchObject, [
+      "receive",
+      "censor",
+      "title",
+      "description",
+      "category",
+      "keywords",
+      "_id",
+      "status",
+    ])
+      .sort({ createdAt: -1 })
+      .skip(pageSize * (pageIndex - 1))
+      .limit(pageSize);
 
-    aggregationPipeline.push(
-      { $skip: pageSize * (pageIndex - 1) },
-      { $limit: pageSize }
+    const listUserData = await User.find(
+      {
+        _id: {
+          $in: [
+            ...data.map((item) => item.receive?.user),
+            ...data.map((item) => item.censor?.user),
+          ],
+        },
+      },
+      ["username"]
     );
-
-    const data = await Post.aggregate(aggregationPipeline);
-
-    const userIds = [
-      ...data.map((item) => item.receive?.user),
-      ...data.map((item) => item.censor?.user),
-    ];
-
-    const listUserData = await User.find({ _id: { $in: userIds } }, ["username"]);
-
     const listPost = data.map((item) => {
       item.receive.user = listUserData.find(
         (itemUser) => itemUser._id.toString() === item.receive?.user.toString()
@@ -88,6 +87,7 @@ const getPagingPost = async (req, res) => {
           (itemUser) => itemUser._id.toString() === item.censor.user.toString()
         );
       }
+
       return item;
     });
 
@@ -107,7 +107,7 @@ const getPagingPost = async (req, res) => {
     console.log(error);
     return res.json({
       success: false,
-      message: error.message,
+      message: "Internal server error!",
       error,
     });
   }
@@ -273,10 +273,11 @@ const receiveRandomPost = async (req, res) => {
       return res.json({ success: false, message: "Bạn còn bài đang viết!" });
     }
     const checkPost = await Post.findOne({
-      "receive.user": req.user.id
+      "receive.user": req.user.id,
+      category:  { $regex: category, $options: "i" }
     });
     if (checkPost) {
-      return res.json({ success: false, message: "Mỗi tài khoản chỉ được làm bài test một lần" });
+      return res.json({ success: false, message: "Mỗi chuyên mục bạn chỉ được làm bài test 1 lần"});
     }
 
     const allPost = await Post.find({status: 0}).select("order");
@@ -530,12 +531,14 @@ const updateStatusPost = async (req, res) => {
     }
     if(status == 2){
       const title = "KẾT QUẢ BÀI VIẾT"
-      const message = `<div><span>Kết quả bài viết của bạn:</span><span style="color: rgb(255, 0, 0); font-weight: bold;">ĐẠT</span>.</br><span style=""> 
-      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng truy cập vào website seo.okvip.vin bằng tài khoản này để bắt đầu nhận bài viết. Mọi thắc mắc liên hệ qua nhóm telegram </span>
-      <a href="https://t.me/+Wr1vjhmjh7dhMTk1"style="color: rgb(17, 85, 204)">https://t.me/+Wr1vjhmjh7dhMTk1</a>
+      const message = `<div>
+      <span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold; text-decoration-skip-ink: none;">ĐẠT</span><span style="">. 
+      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng truy cập vào website </span><a href="https://seo.okvip.vin/" class="" style="color: rgb(17, 85, 204); ">https://seo.okvip.vin/</a><span style=""> bằng tài khoản này để bắt đầu nhận bài viết. Mọi thắc mắc liên hệ qua nhóm telegram </span><a href="https://t.me/+Wr1vjhmjh7dhMTk1" class="" style="color: rgb(17, 85, 204); ">https://t.me/+Wr1vjhmjh7dhMTk1</a><span style=""> 
+      </span>
       </div>
       <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
       <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
+      <div><span style="font-weight: bold">Đánh giá: </span>${note}</div>
       `
       await Notification.create({
         users: [{id: post.receive.user}],
@@ -546,10 +549,11 @@ const updateStatusPost = async (req, res) => {
     }
     if(status == -2){
       const title = "KẾT QUẢ BÀI VIẾT"
-      const message = `<div><span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold;">KHÔNG ĐẠT</span><span style="">. Lưu ý: Mỗi tài khoản chỉ được tham gia bài test một lần!
+      const message = `<div><span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold;">KHÔNG ĐẠT</span><span style="">. Lưu ý: Mỗi chuyên mục bạn chỉ được làm bài test 1 lần!
       </span>
       <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
       <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
+      <div><span style="font-weight: bold">Đánh giá: </span>${note}</div>
       </div>`
       await Notification.create({
         users: [{id: post.receive.user}],
