@@ -42,6 +42,9 @@ const getPagingCTV = async (req, res) => {
             email: { $regex: search, $options: "i" },
           },
           {
+            telegram: { $regex: search, $options: "i" },
+          },
+          {
             nameNoSign: { $regex: search, $options: "i" },
           },
           {
@@ -55,7 +58,7 @@ const getPagingCTV = async (req, res) => {
     }
 
     let data = await User.find(searchQuery)
-      .select("username firstName lastName status")
+      .select("username firstName lastName status email telegram")
       .sort({ createdAt: -1 })
       .skip(pageSize * (pageIndex - 1))
       .limit(pageSize).lean();
