@@ -151,6 +151,18 @@ const remove = async (req, res) => {
 const receiveRandomEntity = async (req, res) => {
   try {
     const user = req.user.id;
+
+    const isPost = await Post.findOne({
+      "receive.user": req.user.id,
+    });
+    if (isPost) {
+      return res.json({ 
+       success: false,
+       message: "Mỗi user chỉ thực hiện bài test entity một lần duy nhất!",
+       data: isPost
+      });
+    }
+
     const checkCurrent = await Post.findOne({
       status: { $in: [0] },
       "receive.user": req.user.id,
