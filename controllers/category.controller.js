@@ -4,6 +4,7 @@ const Category = require("../models/category.model");
 const PagedModel = require("../helpers/PagedModel");
 const userModel = require("../models/user.model");
 const { isValidObjectId } = require("mongoose");
+const { json } = require("body-parser");
 
 const getAll = async (req, res) => {
   try {
@@ -200,7 +201,23 @@ const addUsers = async (req, res) => {
     res.status(500).json({ message: "Đã xảy ra lỗi" });
   }
 };
-
+const getCateByUser = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const cates = await Category.find({$or: [
+      { name: "Tổng hợp" },
+      { 'users': { $in: id } }
+    ]}
+  );
+    return res.json({success: true, data: cates});
+  }catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+}
 module.exports = {
   getAll,
   getCateById,
@@ -209,4 +226,5 @@ module.exports = {
   update,
   remove,
   addUsers,
+  getCateByUser
 };
