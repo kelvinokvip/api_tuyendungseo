@@ -67,8 +67,7 @@ const getPagingCTV = async (req, res) => {
         const acceptPost = await Post.find({
           status: 2,
           "receive.user": item._id.toString(),
-        }).countDocuments();
-
+        });
         const category = await Category.find({users: item._id})
         return {...item, acceptPost, category}
       })

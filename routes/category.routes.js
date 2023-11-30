@@ -10,12 +10,14 @@ const {
   update,
   getCateById,
   addUsers,
+  getCateByUser
 } = require("../controllers/category.controller");
 const { verifyToken } = require("../middlewares/auth.js");
 
 router.get(`/category`, verifyToken, getPaging);
 router.get(`/category/all`, verifyToken, getAll);
 router.get(`/category/:id`, verifyToken, getCateById);
+router.get(`/getCateByUser`, verifyToken, getCateByUser);
 router.post(`/category`, verifyToken, create);
 router.put(`/category/:id`, verifyToken, update);
 router.delete(`/category/:id`, verifyToken, remove);
