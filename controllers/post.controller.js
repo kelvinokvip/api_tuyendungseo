@@ -411,15 +411,17 @@ const getMyPost = async (req, res) => {
     if (search) {
       searchQuery.nameNoSign = { $regex: search, $options: "i" };
     }
-
+    console.log(status, "status")
     if (status) {
       searchQuery.status = status;
+    }else {
+      searchQuery.status = { $ne: -1 } ;
     }
 
     if (isOrder) {
       searchQuery.isOrder = isOrder;
     }
-
+    
     const data = await Post.find(searchQuery)
       .sort({ createdAt: -1 })
       .skip(pageSize * (pageIndex - 1))
