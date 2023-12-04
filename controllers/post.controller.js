@@ -52,7 +52,7 @@ const getPagingPost = async (req, res) => {
         $lte: end
       }
     }
-   
+
     let data = await Post.find(searchObject, [
       "receive",
       "censor",
@@ -62,6 +62,7 @@ const getPagingPost = async (req, res) => {
       "keywords",
       "_id",
       "status",
+      "isOrder",
     ])
       .sort({ createdAt: -1 })
       .skip(pageSize * (pageIndex - 1))
