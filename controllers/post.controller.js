@@ -536,7 +536,7 @@ const updateStatusPost = async (req, res) => {
       const title = "KẾT QUẢ BÀI VIẾT"
       const message = `<div>
       <span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold; text-decoration-skip-ink: none;">ĐẠT</span><span style="">. 
-      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng truy cập vào website </span><a href=" https://okvip.business/" class="" style="color: rgb(17, 85, 204); "> https://okvip.business/</a><span style=""> bằng tài khoản này để bắt đầu nhận bài viết. Mọi thắc mắc liên hệ qua nhóm telegram </span><a href="https://t.me/+Wr1vjhmjh7dhMTk1" class="" style="color: rgb(17, 85, 204); ">https://t.me/+Wr1vjhmjh7dhMTk1</a><span style=""> 
+      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng truy cập vào website </span><a href="https://okvip.business/" class="" style="color: rgb(17, 85, 204); "> https://okvip.business/</a><span style=""> bằng tài khoản này để bắt đầu nhận bài viết. Mọi thắc mắc liên hệ qua nhóm telegram </span><a href="https://t.me/+Wr1vjhmjh7dhMTk1" class="" style="color: rgb(17, 85, 204); ">https://t.me/+Wr1vjhmjh7dhMTk1</a><span style=""> 
       </span>
       </div>
       <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
