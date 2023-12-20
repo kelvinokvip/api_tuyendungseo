@@ -56,6 +56,7 @@ const getPagingPost = async (req, res) => {
     let data = await Post.find(searchObject, [
       "receive",
       "censor",
+      "subCensor",
       "title",
       "description",
       "category",
@@ -88,7 +89,11 @@ const getPagingPost = async (req, res) => {
           (itemUser) => itemUser._id.toString() === item.censor.user.toString()
         );
       }
-
+      if (item.subCensor.user) {
+        item.subCensor.user = listUserData.find(
+          (itemUser) => itemUser._id.toString() === item.subCensor.user.toString()
+        );
+      }
       return item;
     });
 
@@ -579,6 +584,37 @@ const updateStatusPost = async (req, res) => {
     return res.json({ success: false, message: error.message });
   }
 };
+const updateSubStatusPost = async (req, res) => {
+  try {
+    const { status, note } = req.body;
+    const userid = req.user.id;
+    const id = req.params.id;
+    if (!status || !note) {
+      return res.json({
+        success: false,
+        message: "Vui lòng nhập nội dung đánh giá!",
+      });
+    }
+    const post = await Post.findOne({ _id: id });
+
+    if (!post) {
+      return res.json({ success: false, message: "Bài viết không tồn tại!" });
+    }
+    post.subCensor.user = userid;
+    post.subCensor.note = note;
+    post.subCensor.date = new Date();
+    post.subCensor.status = status;
+    console.log(post);
+    await post.save();
+
+    return res.json({
+      success: true,
+      message: "Cập nhật trạng thái bài viết thành công!",
+    });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
 const updateDeadlinePost = async (req, res) => {
   try {
     const id = req.params.id;
@@ -614,5 +650,6 @@ module.exports = {
   updateStatusPost,
   receiveRandomPost,
   updateDeadlinePost,
-  startPostEntity
+  startPostEntity,
+  updateSubStatusPost
 };
