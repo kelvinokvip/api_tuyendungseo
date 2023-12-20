@@ -45,7 +45,6 @@ const getPagingPost = async (req, res) => {
     if(startDate && endDate) {
       const start = new Date(moment(startDate))
       const end= new Date(moment(endDate))
-      console.log(start, end)
       end.setHours(23, 59, 59, 999);
       searchObject["receive.finishTime"] = {
         $gte: start,
@@ -75,6 +74,7 @@ const getPagingPost = async (req, res) => {
           $in: [
             ...data.map((item) => item.receive?.user),
             ...data.map((item) => item.censor?.user),
+            ...data.map((item) => item.subCensor?.user),
           ],
         },
       },
