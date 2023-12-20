@@ -60,6 +60,22 @@ const postSchema = new mongoose.Schema(
         type: String,
       },
     },
+    subCensor: {
+      user: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+      },
+      date: {
+        type: Date,
+        default: new Date(),
+      },
+      note: {
+        type: String,
+      },
+      status: {
+        type: Number, // 2 là duyệt,-2 là không duyệt
+      },
+    },
     timer: {
       //thời gian làm bài (tính theo giờ)
       type: Number,
