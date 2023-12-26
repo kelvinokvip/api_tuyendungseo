@@ -10,7 +10,8 @@ const {
   getSendNotificationALl,
   deleteNotificationById,
   getNotificationById,
-  updateNotificationReaded
+  updateNotificationReaded,
+  deleteNotificationByName
 } = require("../controllers/notification.controller");
 
 router.post("/notification", postSendNotification);
@@ -19,4 +20,5 @@ router.get("/notification/", verifyToken, getSendNotificationALl);
 router.delete("/notification/:id", verifyToken, deleteNotificationById);
 router.get(`/notificationById/:id`, verifyToken, getNotificationById);
 router.put(`/notificationReaded/:id`, verifyToken, updateNotificationReaded);
+router.delete("/deleteNotificationByName", verifyToken, deleteNotificationByName);
 module.exports = router;

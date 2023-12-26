@@ -64,7 +64,7 @@ const getPagingPost = async (req, res) => {
       "status",
       "isOrder",
     ])
-      .sort({ createdAt: -1 })
+      .sort({ 'receive.finishTime' : -1 })
       .skip(pageSize * (pageIndex - 1))
       .limit(pageSize);
 

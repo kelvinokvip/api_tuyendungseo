@@ -164,6 +164,27 @@ const deleteNotificationById = async (req, res) => {
   }
 };
 
+const deleteNotificationByName = async (req, res) => {
+  // Lấy danh sách thông báo cho người dùng cụ thể
+  const notificationName = req.query.name;
+  try {
+    // Xóa thông báo với notificationId
+    const data = await Notification.deleteMany({ title : notificationName});
+    console.log(data);
+    // Trả về phản hồi thành công và thông báo đã tạo
+    res
+      .status(200)
+      .json({ success: true, message: "Notification deleted successfully" });
+  } catch (error) {
+    // Trả về phản hồi lỗi nếu có lỗi xảy ra
+    res.status(500).json({
+      success: false,
+      message: "Failed deleted notifications",
+      error: error.message,
+    });
+  }
+};
+
 const getNotificationById = async (req, res) => {
   const notificationId = req.params.id;
   try {
@@ -215,5 +236,6 @@ module.exports = {
   getSendNotificationALl,
   deleteNotificationById,
   getNotificationById,
-  updateNotificationReaded
+  updateNotificationReaded,
+  deleteNotificationByName
 };

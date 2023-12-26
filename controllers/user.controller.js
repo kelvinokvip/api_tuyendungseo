@@ -4,24 +4,26 @@ const Post = require("../models/post.model");
 const Category = require("../models/category.model");
 const PagedModel = require("../helpers/PagedModel");
 
-const getPagingUser = () => {};
-const getAllUSer = () => {};
-const createUser = () => {};
-const updateUser = () => {};
-const updatePasswordUser = () => {};
-const updateProfile = () => {};
-const removeUser = () => {};
+const getPagingUser = () => { };
+const getAllUSer = () => { };
+const createUser = () => { };
+const updateUser = () => { };
+const updatePasswordUser = () => { };
+const updateProfile = () => { };
+const removeUser = () => { };
+
 const getPagingCTV = async (req, res) => {
   try {
     const pageSize = req.query.pageSize || 10;
     const pageIndex = req.query.pageIndex || 1;
     const search = req.query.search;
     const isUser = req.query.isUser;
-    
+    const isPost = req.query.isPost;
+
     const role = await Role.find({ name: { $regex: "CTV" } });
-    let listRole = role.map(item=>{return item._id});
+    let listRole = role.map(item => { return item._id });
     let searchQuery = {
-      role:  listRole
+      role: listRole
       // status: 0,
     };
 
@@ -53,7 +55,7 @@ const getPagingCTV = async (req, res) => {
         ],
       };
     }
-    if(isUser){
+    if (isUser) {
       searchQuery.isUser = parseInt(isUser, 10);
     }
 
@@ -68,11 +70,31 @@ const getPagingCTV = async (req, res) => {
           status: 2,
           "receive.user": item._id.toString(),
         });
-        const category = await Category.find({users: item._id})
-        return {...item, acceptPost, category}
+        const category = await Category.find({ users: item._id })
+        return { ...item, acceptPost, category }
       })
     );
-   
+    //lấy ra những ctv có bài đã được duyệt
+    if (isPost) {
+      let data = [];
+      dataWithPost.forEach(item => {
+        if (item.acceptPost.length > 0) {
+          data.push(item);
+        }
+      })
+
+      const count = await User.countDocuments(searchQuery);
+      const totalPage = Math.ceil(count / pageSize);
+      const response = new PagedModel(
+        pageIndex,
+        pageSize,
+        totalPage,
+        data,
+        count
+      );
+      return res.json(response);
+    }
+    //
     const count = await User.countDocuments(searchQuery);
     const totalPage = Math.ceil(count / pageSize);
 
@@ -98,7 +120,7 @@ const getPagingCTV = async (req, res) => {
 const getAllCTV = async (req, res) => {
   try {
     const role = await Role.find({ name: { $regex: "CTV" } });
-    let listRole = role.map(item=>{return item._id});
+    let listRole = role.map(item => { return item._id });
     let searchQuery = {
       role: listRole,
     };
