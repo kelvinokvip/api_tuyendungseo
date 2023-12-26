@@ -554,6 +554,10 @@ const updateStatusPost = async (req, res) => {
         message,
         type: "2",
       })
+
+      const data = await User.findByIdAndUpdate(post.receive.user._id, {
+        isPostCTV: true,
+      });
     }
     if(status == -2){
       const title = "KẾT QUẢ BÀI VIẾT"

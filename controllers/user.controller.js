@@ -51,12 +51,16 @@ const getPagingCTV = async (req, res) => {
           },
           {
             username: { $regex: search, $options: "i" },
-          },
+          }
         ],
       };
     }
     if (isUser) {
       searchQuery.isUser = parseInt(isUser, 10);
+    }
+
+    if (isPost) {
+      searchQuery.isPostCTV = isPost ? true : false;
     }
 
     let data = await User.find(searchQuery)
@@ -74,27 +78,7 @@ const getPagingCTV = async (req, res) => {
         return { ...item, acceptPost, category }
       })
     );
-    //lấy ra những ctv có bài đã được duyệt
-    if (isPost) {
-      let data = [];
-      dataWithPost.forEach(item => {
-        if (item.acceptPost.length > 0) {
-          data.push(item);
-        }
-      })
-
-      const count = await User.countDocuments(searchQuery);
-      const totalPage = Math.ceil(count / pageSize);
-      const response = new PagedModel(
-        pageIndex,
-        pageSize,
-        totalPage,
-        data,
-        count
-      );
-      return res.json(response);
-    }
-    //
+    
     const count = await User.countDocuments(searchQuery);
     const totalPage = Math.ceil(count / pageSize);
 

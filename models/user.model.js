@@ -109,6 +109,10 @@ const userSchema = new mongoose.Schema(
       default: 0,
       enum: [0, 1],//0 = content, 1 = entity
     },
+    isPostCTV: {
+      default: false,
+      type: Boolean
+    }
   },
   { timestamps: true }
 );
