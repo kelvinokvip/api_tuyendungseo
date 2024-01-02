@@ -345,7 +345,7 @@ const finishPost = async (req, res) => {
     const userId = req.user.id;
     const { title, content, word } = req.body;
     const expires = Boolean(req.body.expires);
-    console.log(expires, "asdasdsadasdasdsadasdasd");
+
     const post = await Post.findOne({
       _id: postId,
       "receive.user": userId.toString(),
@@ -417,12 +417,13 @@ const getMyPost = async (req, res) => {
     if (search) {
       searchQuery.nameNoSign = { $regex: search, $options: "i" };
     }
-    console.log(status, "status")
     if (status) {
       searchQuery.status = status;
-    }else {
-      searchQuery.status = { $ne: -1 } ;
     }
+    //lấy tất cả các trạng thái của bài viết
+    // else {
+    //   searchQuery.status = { $ne: -1 } ;
+    // }
 
     if (isOrder) {
       searchQuery.isOrder = isOrder;
