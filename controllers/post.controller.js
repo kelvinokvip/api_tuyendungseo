@@ -6,6 +6,7 @@ const User = require("../models/user.model");
 const moment = require("moment/moment");
 const lodash = require("lodash");
 const Notification = require("../models/notification.model");
+const NotifyContent = require("../models/notifyContent.model");
 
 const getPagingPost = async (req, res) => {
   try {
@@ -42,9 +43,9 @@ const getPagingPost = async (req, res) => {
       searchObject.isOrder = JSON.parse(isOrder);
     }
 
-    if(startDate && endDate) {
+    if (startDate && endDate) {
       const start = new Date(moment(startDate))
-      const end= new Date(moment(endDate))
+      const end = new Date(moment(endDate))
       end.setHours(23, 59, 59, 999);
       searchObject["receive.finishTime"] = {
         $gte: start,
@@ -64,7 +65,7 @@ const getPagingPost = async (req, res) => {
       "status",
       "isOrder",
     ])
-      .sort({ 'receive.finishTime' : -1 })
+      .sort({ 'receive.finishTime': -1 })
       .skip(pageSize * (pageIndex - 1))
       .limit(pageSize);
 
@@ -246,8 +247,7 @@ const receivePost = async (req, res) => {
         // deadline: moment().add(2, "hour").toISOString(),
       },
       nameNoSign: unidecode(
-        `${order.require.title} ${
-          order.require.category
+        `${order.require.title} ${order.require.category
         } ${order.require?.keywords?.map((item) => item).toString()}`
       ).toLowerCase(),
     });
@@ -280,23 +280,23 @@ const receiveRandomPost = async (req, res) => {
     }
     const checkPost = await Post.findOne({
       "receive.user": req.user.id,
-      category:  { $regex: category, $options: "i" }
+      category: { $regex: category, $options: "i" }
     });
     if (checkPost) {
-      return res.json({ success: false, message: "Mỗi chuyên mục bạn chỉ được làm bài test 1 lần"});
+      return res.json({ success: false, message: "Mỗi chuyên mục bạn chỉ được làm bài test 1 lần" });
     }
 
-    const allPost = await Post.find({status: 0}).select("order");
+    const allPost = await Post.find({ status: 0 }).select("order");
 
-    let initQuery = {  
+    let initQuery = {
       "require.category": { $regex: category, $options: "i" },
       _id: { $nin: allPost?.map((item) => item.order) },
     };
 
     let data = await OrderPost.find(initQuery).select("require").lean();
     if (data?.length === 0) {
-      data = await OrderPost.find({"require.category": { $regex: category, $options: "i" }}).select("require").lean();
-      if(data?.length === 0){
+      data = await OrderPost.find({ "require.category": { $regex: category, $options: "i" } }).select("require").lean();
+      if (data?.length === 0) {
         return res.json({
           success: false,
           message: "Không còn bài viết để nhận!",
@@ -304,7 +304,7 @@ const receiveRandomPost = async (req, res) => {
       }
     }
     let randomData = lodash.sampleSize(data, 1);
- 
+
     const newPost = new Post({
       title: randomData[0].require.title,
       description: randomData[0].require.description,
@@ -321,8 +321,7 @@ const receiveRandomPost = async (req, res) => {
         // deadline: moment().add(2, "hour").toISOString(),
       },
       nameNoSign: unidecode(
-        `${randomData[0].require.title} ${
-          randomData[0].require.category
+        `${randomData[0].require.title} ${randomData[0].require.category
         } ${randomData[0].require?.keywords?.map((item) => item).toString()}`
       ).toLowerCase(),
     });
@@ -428,7 +427,7 @@ const getMyPost = async (req, res) => {
     if (isOrder) {
       searchQuery.isOrder = isOrder;
     }
-    
+
     const data = await Post.find(searchQuery)
       .sort({ createdAt: -1 })
       .skip(pageSize * (pageIndex - 1))
@@ -470,10 +469,10 @@ const startPost = async (req, res) => {
     }
 
     if (!post.receive?.deadline) {
-        post.receive.deadline = moment().add(post.timer, "hour").add(5, "minutes").toISOString();
-        await post.save();
+      post.receive.deadline = moment().add(post.timer, "hour").add(5, "minutes").toISOString();
+      await post.save();
     }
-    
+
     return res.json({ success: true, message: "Bắt đầu viết bài!", post });
   } catch (error) {
     return res.json({ success: false, message: "Internal server error!" });
@@ -494,11 +493,11 @@ const startPostEntity = async (req, res) => {
     }
 
     if (!post.receive?.deadline) {
-        post.receive.deadline = moment().add(post.timer, "hour").toISOString();
-        await post.save();
+      post.receive.deadline = moment().add(post.timer, "hour").toISOString();
+      await post.save();
     }
 
-    
+
     return res.json({ success: true, message: "Bắt đầu viết bài!", post });
   } catch (error) {
     return res.json({ success: false, message: "Internal server error!" });
@@ -538,19 +537,18 @@ const updateStatusPost = async (req, res) => {
     if (!post) {
       return res.json({ success: false, message: "Bài viết không tồn tại!" });
     }
-    if(status == 2){
-      const title = "KẾT QUẢ BÀI VIẾT"
-      const message = `<div>
-      <span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold; text-decoration-skip-ink: none;">ĐẠT</span><span style="">. 
-      Chúc mừng bạn đã trở thành CTV của hệ thống OKVIP. Bạn vui lòng liên hệ telegram <a href="https://t.me/dizo911" class="" style="color: rgb(17, 85, 204); ">https://t.me/dizo911</a> để được hướng dẫn nhận job!
-      </span>
-      </div>
-      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
-      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
-      <div><span style="font-weight: bold">Đánh giá: </span>${note}</div>
+    if (status == 2) {
+      //lấy thông báo test thành công
+      const notifyTestSuccess = await NotifyContent.findOne({ type: 1});
+
+      const title = "KẾT QUẢ BÀI VIẾT";
+      const message = `${notifyTestSuccess ? notifyTestSuccess?.content : ""}
+      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title ?? ""}</div>
+      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category ?? ""}</div>
+      <div><span style="font-weight: bold">Đánh giá: </span>${note ?? ""}</div>
       `
       await Notification.create({
-        users: [{id: post.receive.user}],
+        users: [{ id: post.receive.user }],
         title,
         message,
         type: "2",
@@ -560,16 +558,18 @@ const updateStatusPost = async (req, res) => {
         isPostCTV: true,
       });
     }
-    if(status == -2){
-      const title = "KẾT QUẢ BÀI VIẾT"
-      const message = `<div><span style="">Kết quả bài viết của bạn: </span><span style="color: rgb(255, 0, 0); font-weight: bold;">KHÔNG ĐẠT</span><span style="">. Lưu ý: Mỗi chuyên mục bạn chỉ được làm bài test 1 lần!
-      </span>
-      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title}</div>
-      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category}</div>
-      <div><span style="font-weight: bold">Đánh giá: </span>${note}</div>
+    if (status == -2) {
+      //lấy thông báo test không thành công
+      const notifyTestFalse = await NotifyContent.findOne({ type: 2 });
+
+      const title = "KẾT QUẢ BÀI VIẾT";
+      const message = `${notifyTestFalse ? notifyTestFalse?.content : ""}
+      <div><span style="font-weight: bold">Tiêu đề: </span>${post.title ?? ""}</div>
+      <div><span style="font-weight: bold">Chuyên mục: </span>${post.category ?? ""}</div>
+      <div><span style="font-weight: bold">Đánh giá: </span>${note ?? ""}</div>
       </div>`
       await Notification.create({
-        users: [{id: post.receive.user}],
+        users: [{ id: post.receive.user }],
         title,
         message,
         type: "2"
